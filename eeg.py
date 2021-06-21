@@ -127,7 +127,6 @@ class EEGParser:  # The script contains one main class which handles DSI-Streame
                             self.fmains = float(mains)
             self.latest_packets = []
             self.latest_packet_headers = []
-        print(f"Returning {self.df}")
         return self.df
 
     def example_plot(self):
