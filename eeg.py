@@ -83,7 +83,7 @@ class EEGParser:  # The script contains one main class which handles DSI-Streame
                         # Add latest packet data to the dataframe if it has been instantiated already
                         # (Reasonably it will always be instantiated by this point)
                         if self.df is not None:
-                            print(self.latest_packet_data.reshape(-1))
+                            print(self.latest_packet_data)
                             #latest_packet_series = pd.Series(self.latest_packet_data.reshape(-1), index=self.montage)
                             timestamp = datetime.datetime.now()
 

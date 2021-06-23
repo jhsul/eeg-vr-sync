@@ -4,6 +4,7 @@ import re
 
 import websockets
 
+from datetime import datetime as dt
 
 
 class VRParser:
@@ -21,7 +22,16 @@ class VRParser:
             message = re.sub(r'[^\x00-\x7f]',r'', message)
             message = re.sub(r'[\u0000-\u0019]+',r'', message)
             print(message)
+            self.server.ws_server.close()
+            #print(dir(self.server.ws_server))
+            self.done = True
+            if self.event_loop is not None:
+                self.event_loop.stop()
 
-    def run_server(self):
+    '''
+    def start_server(self):
+        print(f"[{dt.now()}] Starting websocket server on ws://{self.host}:{self.port}")
         self.server = websockets.serve(self.handler, self.host, self.port)
+
         return self.server
+    '''
