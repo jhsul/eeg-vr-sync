@@ -28,10 +28,9 @@ class VRParser:
             if self.event_loop is not None:
                 self.event_loop.stop()
 
-    '''
+
     def start_server(self):
         print(f"[{dt.now()}] Starting websocket server on ws://{self.host}:{self.port}")
         self.server = websockets.serve(self.handler, self.host, self.port)
 
         return self.server
-    '''

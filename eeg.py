@@ -18,11 +18,13 @@
 # Copyright (c) 2014-2020 Wearable Sensing LLC
 import concurrent.futures
 import socket, struct, time
+import tkinter.filedialog
+
 import numpy as np
 import matplotlib.pyplot as plt
 import threading
 import pandas as pd
-import datetime
+from datetime import datetime as dt
 
 
 class EEGParser:  # The script contains one main class which handles DSI-Streamer data packet parsing.
@@ -46,8 +48,8 @@ class EEGParser:  # The script contains one main class which handles DSI-Streame
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.host, self.port))
 
-    def parse_data(self):
-
+    def parse_data(self, app):
+        self.app = app
         # parse_data() receives DSI-Streamer TCP/IP packets and updates the signal_log and time_log attributes
         # which capture EEG data and time data, respectively, from the last 100 EEG data packets (by default) into a numpy array.
         while not self.done:
@@ -83,9 +85,11 @@ class EEGParser:  # The script contains one main class which handles DSI-Streame
                         # Add latest packet data to the dataframe if it has been instantiated already
                         # (Reasonably it will always be instantiated by this point)
                         if self.df is not None:
-                            print(self.latest_packet_data)
+                            #print(self.latest_packet_data)
+                            self.app.data_count += 1
+                            self.app.data_status.set(f"Data points collected: {self.app.data_count}")
                             #latest_packet_series = pd.Series(self.latest_packet_data.reshape(-1), index=self.montage)
-                            timestamp = datetime.datetime.now()
+                            timestamp = dt.now()
 
                             new_row = pd.DataFrame(self.latest_packet_data.reshape(1, -1), columns=self.montage, index=[timestamp])
 
@@ -107,9 +111,15 @@ class EEGParser:  # The script contains one main class which handles DSI-Streame
                         if event_code == 3:
                             print("Received stop signal, finishing up EEG data collection")
                             print(self.df)
+
+                            output_path = tkinter.filedialog.asksaveasfilename()
+                            self.df.to_csv(output_path)
+
+                            self.app.data_status.set(f"Saved to {output_path}")
                             self.done = True
 
                         if event_code == 9:
+                            self.app.connection_status.set("Connected")
                             montage = self.latest_packets[index][24:24 + message_length].decode()
                             montage = montage.strip()
                             print("Montage = " + montage)
